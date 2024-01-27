@@ -1,0 +1,207 @@
+#include <iostream>
+#include <vector>
+#include <iomanip>
+using namespace std;
+
+class RepairRecord
+{
+public:
+    string licensePlate;
+    string ownerName;
+    string repairDescription;
+    double repairCost;
+    vector<string> partsUsed;
+    int laborHours;
+    bool hasLicensePlate(const string& plate) const
+    {
+        return licensePlate == plate;
+    }
+};
+
+vector<RepairRecord> people;
+int repairsAtOnce;
+
+void addVectorContent(vector<string>& someVector)
+{
+    cout << "How many parts were used for the repair? ";
+    int numParts;
+    cin >> numParts;
+    cin.ignore();
+    for (int i = 0; i < numParts; i++)
+    {
+        cout << "Enter name of part " << i + 1 << " : ";
+        string part;
+        getline(cin, part);
+        someVector.push_back(part);
+    }
+}
+
+void addRepairRecord()
+{
+    for (int i = 0; i < repairsAtOnce; i++)
+    {
+        cout << "Repair " << i + 1 << endl;
+        RepairRecord s;
+        cout << "License plate: ";
+        getline(cin, s.licensePlate);
+        cout << "Name: ";
+        getline(cin, s.ownerName);
+        cout << "Repair description: ";
+        getline(cin, s.repairDescription);
+        cout << "Overall cost: ";
+        cin >> s.repairCost;
+        while(!cin.good())
+        {
+
+            cout << "Write only numbers!" << endl;
+            cin.clear();
+            cin.ignore(INT_MAX, '\n');
+            cout << "Overall cost: ";
+            cin >> s.repairCost;
+        }
+        cin.ignore();
+        cout << "Labor hours: ";
+        cin >> s.laborHours;
+        while(!cin.good())
+        {
+            cout << "Write only whole numbers!" << endl;
+            cin.clear();
+            cin.ignore(INT_MAX, '\n');
+            cout << "Labor hours: ";
+            cin >> s.laborHours;
+        }
+        cin.ignore();
+        vector<string> c;
+        addVectorContent(c);
+        s.partsUsed = c;
+        people.push_back(s);
+    }
+}
+
+void printPartsUsed(vector<string> randomVector)
+{
+    cout << "The parts used for this repair were:" << endl;
+    for (int i = 0; i < randomVector.size(); i++)
+    {
+        cout << randomVector[i] << endl;
+    }
+    cout << endl;
+}
+
+void showTextRepairs(RepairRecord singleRepair)
+{
+    cout << "License plate number: " << singleRepair.licensePlate << "\t"
+         << "Owner's name: " << singleRepair.ownerName << "\t"
+         << "Overall cost: " << singleRepair.repairCost << "\t"
+         << "Labor hours: " << singleRepair.laborHours << "\t"
+         << "\nRepair description: \n" << singleRepair.repairDescription << endl;
+}
+
+void displayRepairRecords()
+{
+    for (int i = 0; i < people.size(); i++)
+    {
+        cout << "----------------------------------------------" << endl;
+        showTextRepairs(people[i]);
+        printPartsUsed(people[i].partsUsed);
+        cout << endl;
+    }
+}
+
+RepairRecord* searchByLicensePlate(const string& licensePlate)
+{
+    for (int i = 0; i < people.size(); ++i)
+    {
+        if (people[i].hasLicensePlate(licensePlate))
+        {
+            return &people[i];
+        }
+    }
+    return nullptr;
+}
+
+int GetChoice()
+{
+    int choice = 0;
+    cout << "\nAdd a repair record (1)" << endl;
+    cout << "Display all repair records (2)" << endl;
+    cout << "Search for a record (3)" << endl;
+    cout << "Exit program (4)" << endl;
+    cin >> setw(1)>> choice;
+
+    while(!cin.good())
+    {
+
+        cout <<"Faulty input!"<< endl;
+        cin.clear();
+        cin.ignore(INT_MAX, '\n');
+        cout << "\nAdd a repair record (1)" << endl;
+        cout << "Display all repair records (2)" << endl;
+        cout << "Search for a record (3)" << endl;
+        cout << "Exit program (4)" << endl;
+        cin >> setw(1)>> choice;
+        cin.ignore();
+    }
+
+    cin.clear();
+    cin.ignore(INT_MAX, '\n');
+    return choice;
+
+}
+
+
+int main()
+{
+
+
+
+    int choice;
+    do
+    {
+        choice = GetChoice();
+
+        switch(choice)
+        {
+            case 1:
+                cout << "How many repairs do you want to add at once? ";
+                cin >> repairsAtOnce;
+                cin.ignore();
+                addRepairRecord();
+                break;
+            case 2:
+                displayRepairRecords();
+                break;
+            case 3:
+                {
+                    string searchLicensePlate;
+                    cout << "Enter license plate to search: ";
+                    getline(cin, searchLicensePlate);
+                    RepairRecord* foundRecord = searchByLicensePlate(searchLicensePlate);
+                    if (foundRecord)
+                    {
+                        cout << "Record found:" << endl;
+                        showTextRepairs(*foundRecord);
+                        printPartsUsed(foundRecord->partsUsed);
+                    }
+                    else
+                    {
+                        cout << "Record not found." << endl;
+
+                    }
+                }
+                break;
+            case 4:
+                return 0;
+            default:
+                cout << "Enter 1-4!" << endl;
+
+        }
+
+        choice = GetChoice();
+
+    }
+    while(choice != 4);
+
+}
+
+
